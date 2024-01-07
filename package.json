@@ -19,5 +19,10 @@
     "cohere-ai": "^7.6.2",
     "concurrently": "^8.2.2",
     "cross-fetch": "^4.0.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
   }
 }
