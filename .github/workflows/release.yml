@@ -26,9 +26,6 @@ jobs:
 
       - name: Install packages
         run: npm install
-
-      - name: Compile to distributable
-        run: npm run compile
         
       - name: Setup semantic-release
         run: npm install --location=global semantic-release @semantic-release/changelog @semantic-release/git conventional-changelog-conventionalcommits
