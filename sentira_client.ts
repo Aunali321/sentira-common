@@ -21,7 +21,7 @@ export class SentiraAIClient {
         if (urlRegex.test(body.text)) {
             // If text contains a URL, call the transcribe method
             const transcription = await this.transcribe({ userId: "", inputType: "url", audioUrl: body.text, transcriptType: "srt", pathToFile: "", mimeType: "", useSubtitles: true });
-            body.text = transcription.response;
+            body.text = transcription.response as any;
         }
 
         const response = await fetch(`${this.baseUrl}/summarize`, {
