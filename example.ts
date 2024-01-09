@@ -28,4 +28,12 @@ async function summarizeText(): Promise<void> {
     console.log(summary.response.summary);
 }
 
-summarizeText();
+// summarizeText();
+
+async function createApiKey(): Promise<void> {
+    let apiKey = await client.createApiKey({
+        name: "client",
+        scopes: ["transcribe"]
+    });
+    console.log(apiKey);
+}

@@ -1,9 +1,9 @@
 // A shared api client for sentira services
 import fetch from 'cross-fetch';
-import { CohereAPIResponse, CohereSummarizeRequestBody, DeepgramAPIResponse, DeepgramRequestBody } from './lib/types';
+import { ApiKey, CohereAPIResponse, CohereSummarizeRequestBody, DeepgramAPIResponse, DeepgramRequestBody } from './lib/types';
 
 export class SentiraAIClient {
-    private readonly baseUrl = "https://api.sentiraai.com/"
+    private readonly baseUrl = "https://api.sentiraai.com"
     private apiKey: string;
 
     constructor(apiKey: string) {
@@ -74,6 +74,30 @@ export class SentiraAIClient {
             audioDuration: data.audioDuration,
             response: data.response
         };
+    }
+
+    public async createApiKey(body: { name: string, scopes: string[] }): Promise<string> {
+        console.info("CreateApiKey method called");
+        const response = await fetch(`${this.baseUrl}/api-keys`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': this.apiKey,
+            },
+            body: JSON.stringify({
+                userId: this.apiKey,
+                name: body.name,
+                scopes: body.scopes,
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to create api key: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.info(`CreateApiKey response: ${JSON.stringify(data)}`);
+        return data.key;
     }
 
 }
