@@ -37,3 +37,9 @@ async function createApiKey(): Promise<void> {
     });
     console.log(apiKey);
 }
+
+
+async function getApiKeys(): Promise<void> {
+    let apiKeys = await client.getApiKeys();
+    console.log(apiKeys);
+}

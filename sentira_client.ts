@@ -84,6 +84,7 @@ export class SentiraAIClient {
                 'Content-Type': 'application/json',
                 'x-api-key': this.apiKey,
             },
+            //TODO: be able to use session id here
             body: JSON.stringify({
                 userId: this.apiKey,
                 name: body.name,
@@ -98,6 +99,29 @@ export class SentiraAIClient {
         const data = await response.json();
         console.info(`CreateApiKey response: ${JSON.stringify(data)}`);
         return data.key;
+    }
+
+    public async getApiKeys(): Promise<ApiKey[]> {
+        console.info("GetApiKeys method called");
+        const response = await fetch(`${this.baseUrl}/api-keys`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                //TODO: be able to use session id here
+                'x-api-key': this.apiKey,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to get api keys: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        console.info(`GetApiKeys response: ${JSON.stringify(data)}`);
+
+        return data;
+
     }
 
 }
