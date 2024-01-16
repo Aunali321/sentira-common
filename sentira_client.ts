@@ -3,17 +3,37 @@ import fetch from 'cross-fetch';
 import { ApiKey, CohereAPIResponse, CohereSummarizeRequestBody, DeepgramAPIResponse, DeepgramRequestBody } from './lib/types';
 
 export class SentiraAIClient {
-    private readonly baseUrl = "https://api.sentiraai.com"
+    private baseUrl = "https://api.sentiraai.com"
     private apiKey: string;
+    private debugMode: boolean = false;
 
     constructor(apiKey: string) {
-        console.info("SentiraAI API initialized");
+        if (this.debugMode) {
+            console.info("SentiraAI API initialized");
+        }
         this.apiKey = apiKey;
     }
 
+    public toggleDebugMode(): void {
+        this.debugMode = !this.debugMode;
+        console.log("Debug mode: ", this.debugMode)
+    }
+
+    public setBaseUrl(newBaseUrl: string): void {
+        if (this.debugMode) {
+            console.info("Base URL is being updated");
+        }
+        this.baseUrl = newBaseUrl;
+        if (this.debugMode) {
+            console.info("Base URL has been updated");
+        }
+    }
+
     public async summarize(body: CohereSummarizeRequestBody): Promise<CohereAPIResponse> {
-        console.info("Summarize method called");
-        console.info(`Summarize request body: ${JSON.stringify(body)}`);
+        if (this.debugMode) {
+            console.info("Summarize method called");
+            console.info(`Summarize request body: ${JSON.stringify(body)}`);
+        }
 
         // Regular expression to check if text contains a URL
         const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -38,7 +58,9 @@ export class SentiraAIClient {
         }
 
         const data = await response.json();
-        console.info(`Summarize response: ${JSON.stringify(data)}`);
+        if (this.debugMode) {
+            console.info(`Summarize response: ${JSON.stringify(data)}`);
+        }
         return {
             result: data.result,
             creditsUsed: data.creditsUsed,
@@ -51,8 +73,10 @@ export class SentiraAIClient {
     }
 
     public async transcribe(body: DeepgramRequestBody): Promise<DeepgramAPIResponse> {
-        console.info("Transcribe method called");
-        console.info(`Transcribe request body: ${JSON.stringify(body)}`);
+        if (this.debugMode) {
+            console.info("Transcribe method called");
+            console.info(`Transcribe request body: ${JSON.stringify(body)}`);
+        }
         const response = await fetch(`${this.baseUrl}/transcribe`, {
             method: 'POST',
             headers: {
@@ -67,7 +91,9 @@ export class SentiraAIClient {
         }
 
         const data = await response.json();
-        console.info(`Transcribe response: ${JSON.stringify(data)}`);
+        if (this.debugMode) {
+            console.info(`Transcribe response: ${JSON.stringify(data)}`);
+        }
         return {
             result: data.result,
             creditsUsed: data.creditsUsed,
@@ -77,7 +103,9 @@ export class SentiraAIClient {
     }
 
     public async createApiKey(body: { name: string, scopes: string[] }): Promise<string> {
-        console.info("CreateApiKey method called");
+        if (this.debugMode) {
+            console.info("CreateApiKey method called");
+        }
         const response = await fetch(`${this.baseUrl}/api-keys`, {
             method: 'POST',
             headers: {
@@ -97,12 +125,16 @@ export class SentiraAIClient {
         }
 
         const data = await response.json();
-        console.info(`CreateApiKey response: ${JSON.stringify(data)}`);
+        if (this.debugMode) {
+            console.info(`CreateApiKey response: ${JSON.stringify(data)}`);
+        }
         return data.key;
     }
 
     public async getApiKeys(): Promise<ApiKey[]> {
-        console.info("GetApiKeys method called");
+        if (this.debugMode) {
+            console.info("GetApiKeys method called");
+        }
         const response = await fetch(`${this.baseUrl}/api-keys`, {
             method: 'GET',
             headers: {
@@ -118,10 +150,20 @@ export class SentiraAIClient {
 
         const data = await response.json();
 
-        console.info(`GetApiKeys response: ${JSON.stringify(data)}`);
-
+        if (this.debugMode) {
+            console.info(`GetApiKeys response: ${JSON.stringify(data)}`);
+        }
         return data;
+    }
 
+    public setApiKey(newApiKey: string): void {
+        if (this.debugMode) {
+            console.info("API key is being updated");
+        }
+        this.apiKey = newApiKey;
+        if (this.debugMode) {
+            console.info("API key has been updated");
+        }
     }
 
 }
