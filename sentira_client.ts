@@ -35,15 +35,6 @@ export class SentiraAIClient {
             console.info(`Summarize request body: ${JSON.stringify(body)}`);
         }
 
-        // Regular expression to check if text contains a URL
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-
-        if (urlRegex.test(body.text)) {
-            // If text contains a URL, call the transcribe method
-            const transcription = await this.transcribe({ userId: "", inputType: "url", audioUrl: body.text, transcriptType: "srt", pathToFile: "", mimeType: "", useSubtitles: true });
-            body.text = transcription.response as any;
-        }
-
         const response = await fetch(`${this.baseUrl}/summarize`, {
             method: 'POST',
             headers: {
@@ -100,6 +91,43 @@ export class SentiraAIClient {
             audioDuration: data.audioDuration,
             response: data.response
         };
+    }
+
+    public async transcribeOrSummarize(body: CohereSummarizeRequestBody): Promise<CohereAPIResponse> {
+        if (this.debugMode) {
+            console.info("TranscribeOrSummarize method called");
+        }
+
+        // First, transcribe the audio
+        const transcriptionResponse = await this.transcribe({
+            userId: body.userId,
+            inputType: 'url',
+            transcriptType: 'json',
+            pathToFile: null,
+            audioUrl: body.text,
+            mimeType: null,
+            useSubtitles: true,
+        });
+
+        if (!transcriptionResponse || transcriptionResponse.result !== 'Ok') {
+            throw new Error(`Failed to transcribe: ${JSON.stringify(transcriptionResponse)}`);
+        }
+
+        // Then, summarize the transcript
+        const summaryRequestBody: CohereSummarizeRequestBody = {
+            userId: body.userId,
+            text: transcriptionResponse.response.transcript,
+            model: body.model,
+            summaryLength: body.summaryLength,
+            summaryFormat: body.summaryFormat,
+        };
+        const summaryResponse = await this.summarize(summaryRequestBody);
+
+        if (this.debugMode) {
+            console.info(`TranscribeOrSummarize response: ${JSON.stringify(summaryResponse)}`);
+        }
+
+        return summaryResponse;
     }
 
     public async createApiKey(body: { name: string, scopes: string[] }): Promise<string> {

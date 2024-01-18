@@ -3,6 +3,9 @@ import { SentiraAIClient } from "./sentira_client";
 
 let client = new SentiraAIClient("api-key");
 
+client.toggleDebugMode();
+
+
 async function transcribeAudio(): Promise<DeepgramAPIResponse> {
     let transcription: DeepgramAPIResponse = await client.transcribe({
         userId: "",
@@ -42,4 +45,17 @@ async function createApiKey(): Promise<void> {
 async function getApiKeys(): Promise<void> {
     let apiKeys = await client.getApiKeys();
     console.log(apiKeys);
+}
+
+
+async function transcribeOrSummarize() {
+    let summary = await client.transcribeOrSummarize({
+        userId: "",
+        text: "https://www.youtube.com/watch?v=Jlok6TYFhGs",
+        model: "command",
+        summaryLength: "long",
+        summaryFormat: "bullets"
+    });
+
+    console.log(summary.response.summary);
 }

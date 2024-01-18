@@ -94,6 +94,7 @@ export interface CohereSummarizeRequestBody {
     summaryLength?: "short" | "medium" | "long";
     summaryFormat?: "paragraph" | "bullets";
     model: 'command' | 'command-light' | 'command-nightly' | 'command-light-nightly';
+    additionalCommand?: string;
 }
 
 export interface CohereSummarizeAPIResponse {
