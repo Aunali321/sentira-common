@@ -1,10 +1,11 @@
 // A shared api client for sentira services
 import fetch from 'cross-fetch';
-import { ApiKey, CohereAPIResponse, CohereSummarizeRequestBody, DeepgramAPIResponse, DeepgramRequestBody } from './lib/types';
+import { ApiKey, SentiraSummaryAPIResponse, SentiraSummarizeRequestBody, SentiraTranscriptAPIResponse, SentiraTranscriptionRequestBody, TranscriptionInputType, TranscriptionType } from './lib/types';
 
 export class SentiraAIClient {
     private baseUrl = "https://api.sentiraai.com"
     private apiKey: string;
+    private accessToken: string | null = null;
     private debugMode: boolean = false;
 
     constructor(apiKey: string) {
@@ -29,7 +30,15 @@ export class SentiraAIClient {
         }
     }
 
-    public async summarize(body: CohereSummarizeRequestBody): Promise<CohereAPIResponse> {
+    private getAuthHeader(): { [key: string]: string } {
+        if (this.accessToken) {
+            return { 'Authorization': `${this.accessToken}` };
+        } else {
+            return { 'x-api-key': this.apiKey };
+        }
+    }
+
+    public async summarize(body: SentiraSummarizeRequestBody): Promise<SentiraSummaryAPIResponse> {
         if (this.debugMode) {
             console.info("Summarize method called");
             console.info(`Summarize request body: ${JSON.stringify(body)}`);
@@ -39,7 +48,7 @@ export class SentiraAIClient {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': this.apiKey
+                ...this.getAuthHeader()
             },
             body: JSON.stringify(body)
         });
@@ -63,7 +72,7 @@ export class SentiraAIClient {
         };
     }
 
-    public async transcribe(body: DeepgramRequestBody): Promise<DeepgramAPIResponse> {
+    public async transcribe(body: SentiraTranscriptionRequestBody): Promise<SentiraTranscriptAPIResponse> {
         if (this.debugMode) {
             console.info("Transcribe method called");
             console.info(`Transcribe request body: ${JSON.stringify(body)}`);
@@ -72,7 +81,7 @@ export class SentiraAIClient {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': this.apiKey
+                ...this.getAuthHeader()
             },
             body: JSON.stringify(body)
         });
@@ -93,7 +102,7 @@ export class SentiraAIClient {
         };
     }
 
-    public async transcribeOrSummarize(body: CohereSummarizeRequestBody): Promise<CohereAPIResponse> {
+    public async transcribeOrSummarize(body: SentiraSummarizeRequestBody): Promise<SentiraSummaryAPIResponse> {
         if (this.debugMode) {
             console.info("TranscribeOrSummarize method called");
         }
@@ -101,8 +110,8 @@ export class SentiraAIClient {
         // First, transcribe the audio
         const transcriptionResponse = await this.transcribe({
             userId: body.userId,
-            inputType: 'url',
-            transcriptType: 'json',
+            inputType: TranscriptionInputType.URL,
+            transcriptType: TranscriptionType.TEXT,
             pathToFile: null,
             audioUrl: body.text,
             mimeType: null,
@@ -114,7 +123,7 @@ export class SentiraAIClient {
         }
 
         // Then, summarize the transcript
-        const summaryRequestBody: CohereSummarizeRequestBody = {
+        const summaryRequestBody: SentiraSummarizeRequestBody = {
             userId: body.userId,
             text: transcriptionResponse.response.transcript,
             model: body.model,
@@ -138,7 +147,7 @@ export class SentiraAIClient {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': this.apiKey,
+                ...this.getAuthHeader()
             },
             //TODO: be able to use session id here
             body: JSON.stringify({
@@ -167,8 +176,7 @@ export class SentiraAIClient {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                //TODO: be able to use session id here
-                'x-api-key': this.apiKey,
+                ...this.getAuthHeader()
             },
         });
 

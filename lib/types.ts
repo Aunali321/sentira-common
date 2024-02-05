@@ -1,11 +1,22 @@
-export interface DeepgramRequestBody {
+export interface SentiraTranscriptionRequestBody {
     userId: string;
-    inputType: 'url' | 'file';
-    transcriptType: 'json' | 'srt' | 'vtt';
+    inputType: TranscriptionInputType;
+    transcriptType: TranscriptionType;
     pathToFile?: string | null;
     audioUrl?: string | null;
     mimeType?: string | null;
     useSubtitles?: boolean;
+}
+
+export enum TranscriptionInputType {
+    URL = "url",
+    FILE = "file"
+}
+
+export enum TranscriptionType {
+    TEXT = "text",
+    SRT = "srt",
+    VTT = "vtt"
 }
 
 interface Word {
@@ -66,7 +77,7 @@ interface Utterance {
     id: string;
 }
 
-export interface DeepgramSpeechToTextResponse {
+export interface SentiraSpeechToTextResponse {
     transcript: string;
     response: {
         metadata: {
@@ -81,32 +92,50 @@ export interface DeepgramSpeechToTextResponse {
     };
 }
 
-export interface DeepgramAPIResponse {
+export interface SentiraTranscriptAPIResponse {
     result: string;
     creditsUsed: number;
     audioDuration: number;
-    response: DeepgramSpeechToTextResponse;
+    response: SentiraSpeechToTextResponse;
 }
 
-export interface CohereSummarizeRequestBody {
+export interface SentiraSummarizeRequestBody {
     userId: string;
     text: string;
-    summaryLength?: "short" | "medium" | "long";
-    summaryFormat?: "paragraph" | "bullets";
-    model: 'command' | 'command-light' | 'command-nightly' | 'command-light-nightly';
+    summaryLength?: SummaryLength;
+    summaryFormat?: SummaryFormat;
+    model: SummaryModel;
     additionalCommand?: string;
 }
 
-export interface CohereSummarizeAPIResponse {
+export enum SummaryLength {
+    SHORT = "short",
+    MEDIUM = "medium",
+    LONG = "long"
+}
+
+export enum SummaryFormat {
+    PARAGRAPH = "paragraph",
+    BULLETS = "bullets"
+}
+
+export enum SummaryModel {
+    COMMAND = "command",
+    COMMAND_LIGHT = "command-light",
+    COMMAND_NIGHTLY = "command-nightly",
+    COMMAND_LIGHT_NIGHTLY = "command-light-nightly"
+}
+
+export interface SentiraSummarizeAPIResponse {
     id?: string;
     summary?: string;
 }
 
-export interface CohereAPIResponse {
+export interface SentiraSummaryAPIResponse {
     result: string;
     creditsUsed: number;
     tokensProcessed: number;
-    response: CohereSummarizeAPIResponse;
+    response: SentiraSummarizeAPIResponse;
 }
 
 

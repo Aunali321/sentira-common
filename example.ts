@@ -1,4 +1,4 @@
-import { DeepgramAPIResponse } from "./lib/types";
+import { SentiraTranscriptAPIResponse, SummaryFormat, SummaryLength, SummaryModel, TranscriptionInputType, TranscriptionType } from "./lib/types";
 import { SentiraAIClient } from "./sentira_client";
 
 let client = new SentiraAIClient("api-key");
@@ -6,12 +6,12 @@ let client = new SentiraAIClient("api-key");
 client.toggleDebugMode();
 
 
-async function transcribeAudio(): Promise<DeepgramAPIResponse> {
-    let transcription: DeepgramAPIResponse = await client.transcribe({
+async function transcribeAudio(): Promise<SentiraTranscriptAPIResponse> {
+    let transcription: SentiraTranscriptAPIResponse = await client.transcribe({
         userId: "",
-        inputType: "url",
+        inputType: TranscriptionInputType.URL,
         audioUrl: "https://www.youtube.com/watch?v=K9mzg8ueiYA",
-        transcriptType: "srt",
+        transcriptType: TranscriptionType.SRT,
         pathToFile: "",
         mimeType: "",
         useSubtitles: true
@@ -24,9 +24,9 @@ async function summarizeText(): Promise<void> {
     let summary = await client.summarize({
         userId: "",
         text: text,
-        model: "command-light",
-        summaryLength: "short",
-        summaryFormat: "bullets"
+        model: SummaryModel.COMMAND_LIGHT,
+        summaryLength: SummaryLength.LONG,
+        summaryFormat: SummaryFormat.BULLETS
     });
     console.log(summary.response.summary);
 }
@@ -52,9 +52,9 @@ async function transcribeOrSummarize() {
     let summary = await client.transcribeOrSummarize({
         userId: "",
         text: "https://www.youtube.com/watch?v=Jlok6TYFhGs",
-        model: "command",
-        summaryLength: "long",
-        summaryFormat: "bullets"
+        model: SummaryModel.COMMAND,
+        summaryLength: SummaryLength.LONG,
+        summaryFormat: SummaryFormat.BULLETS
     });
 
     console.log(summary.response.summary);
