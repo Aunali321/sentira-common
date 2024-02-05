@@ -4,15 +4,23 @@ import { ApiKey, SentiraSummaryAPIResponse, SentiraSummarizeRequestBody, Sentira
 
 export class SentiraAIClient {
     private baseUrl = "https://api.sentiraai.com"
-    private apiKey: string;
+    private apiKey: string | null = null;
     private accessToken: string | null = null;
     private debugMode: boolean = false;
 
-    constructor(apiKey: string) {
+    constructor({ apiKey, accessToken }: { apiKey?: string, accessToken?: string }) {
         if (this.debugMode) {
             console.info("SentiraAI API initialized");
         }
-        this.apiKey = apiKey;
+        if (apiKey) {
+            this.apiKey = apiKey;
+        }
+        if (accessToken) {
+            this.accessToken = accessToken;
+        }
+        if (!apiKey && !accessToken) {
+            throw new Error('Either Api Key or Access Token must be provided. Get your API key from https://sentiraai.com');
+        }
     }
 
     public toggleDebugMode(): void {
@@ -34,7 +42,7 @@ export class SentiraAIClient {
         if (this.accessToken) {
             return { 'Authorization': `${this.accessToken}` };
         } else {
-            return { 'x-api-key': this.apiKey };
+            return { 'x-api-key': `${this.apiKey}` };
         }
     }
 
@@ -188,6 +196,29 @@ export class SentiraAIClient {
 
         if (this.debugMode) {
             console.info(`GetApiKeys response: ${JSON.stringify(data)}`);
+        }
+        return data;
+    }
+
+    public async deleteApiKey(id: string): Promise<string> {
+        if (this.debugMode) {
+            console.info("DeleteApiKey method called");
+        }
+        const response = await fetch(`${this.baseUrl}/api-keys/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                ...this.getAuthHeader()
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete api key: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (this.debugMode) {
+            console.info(`DeleteApiKey response: ${JSON.stringify(data)}`);
         }
         return data;
     }

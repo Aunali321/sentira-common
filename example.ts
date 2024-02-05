@@ -1,7 +1,9 @@
 import { SentiraTranscriptAPIResponse, SummaryFormat, SummaryLength, SummaryModel, TranscriptionInputType, TranscriptionType } from "./lib/types";
 import { SentiraAIClient } from "./sentira_client";
 
-let client = new SentiraAIClient("api-key");
+let client = new SentiraAIClient({
+    apiKey: "your-api-key",
+});
 
 client.toggleDebugMode();
 
@@ -45,6 +47,14 @@ async function createApiKey(): Promise<void> {
 async function getApiKeys(): Promise<void> {
     let apiKeys = await client.getApiKeys();
     console.log(apiKeys);
+}
+
+async function deleteApiKey(): Promise<void> {
+    let apiKey = await client.getApiKeys().then(keys => keys[0]);
+    if (!apiKey.id) {
+        return;
+    }
+    await client.deleteApiKey(apiKey.id);
 }
 
 
