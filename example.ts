@@ -14,7 +14,7 @@ async function transcribeAudio(): Promise<SentiraTranscriptAPIResponse> {
         inputType: TranscriptionInputType.URL,
         audioUrl: "https://www.youtube.com/watch?v=K9mzg8ueiYA",
         transcriptType: TranscriptionType.SRT,
-        pathToFile: "",
+        file: null,
         mimeType: "",
         useSubtitles: true
     });
