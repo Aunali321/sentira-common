@@ -2,10 +2,10 @@ export interface SentiraTranscriptionRequestBody {
     userId: string;
     inputType: TranscriptionInputType;
     transcriptType: TranscriptionType;
-    pathToFile?: string | null;
     audioUrl?: string | null;
     mimeType?: string | null;
     useSubtitles?: boolean;
+    file?: File | null;
 }
 
 export enum TranscriptionInputType {
