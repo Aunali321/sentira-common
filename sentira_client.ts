@@ -80,19 +80,38 @@ export class SentiraAIClient {
         };
     }
 
-    public async transcribe(body: SentiraTranscriptionRequestBody): Promise<SentiraTranscriptAPIResponse> {
+    public async transcribe(body: SentiraTranscriptionRequestBody, file?: File): Promise<SentiraTranscriptAPIResponse> {
         if (this.debugMode) {
             console.info("Transcribe method called");
             console.info(`Transcribe request body: ${JSON.stringify(body)}`);
         }
+
+        let headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            ...this.getAuthHeader()
+        };
+
+        let request_body;
+
+        if (file) {
+            // If a file is provided, use FormData
+            const formData = new FormData();
+            formData.append('audioFile', file);
+            formData.append('body', JSON.stringify(body));
+            request_body = formData;
+            // When using FormData, the browser will set the 'Content-Type' header to 'multipart/form-data'
+            // and append the appropriate 'boundary' parameter.
+            delete headers['Content-Type'];
+        } else {
+            request_body = JSON.stringify(body);
+        }
+
         const response = await fetch(`${this.baseUrl}/transcribe`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...this.getAuthHeader()
-            },
-            body: JSON.stringify(body)
+            headers: headers,
+            body: request_body
         });
+
 
         if (!response.ok) {
             throw new Error(`Failed to transcribe: ${response.statusText}`);
